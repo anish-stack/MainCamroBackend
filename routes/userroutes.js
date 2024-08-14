@@ -3,7 +3,7 @@ const Image = require('../models/AllImages')
 const { RegisterUser, LogginUser, LogoutUser, getUserIdbyUser, createContact, getContacts, getAllUser, changePassword, PasswordChangeRequest, ResendOtp, VerifyOtp, verifyOtpForSignIn, ResendSignOtp } = require('../controllers/usercontroller')
 const { createProduct, getAllProducts, getOneProduct, updateProduct, deleteProduct, getProductByKeywords, getAllCategoryWithImagesAndNumberOfProducts, getProductsByProductNameOrCategory, ImageUpload, getAllImages } = require('../controllers/productController')
 const { protect } = require('../middleware/authmiddlleware')
-const { CreateOrder, orderForMe, orderForAdmin, UpdateOrderStatus, getTransactionID, getSingleOrderById } = require('../controllers/orderController')
+const { CreateOrder, orderForMe, orderForAdmin, UpdateOrderStatus, getTransactionID, getSingleOrderById, deleteOrderById } = require('../controllers/orderController')
 const { createBanner, getllbanner, deleteBanner, markInactiveBanner, getAllActiveBanners, toggleBannerActiveStatus, makeCategories, getAllCategories, deleteCategoryById, makeTags, getTags, deleteTags, createVouchers, editVoucher, deleteVoucher, getVouchers, updateCategories } = require('../controllers/WebpageController')
 const router = express.Router()
 const multer = require('multer');
@@ -12,6 +12,7 @@ const {   CreateMainCategorey,
     GetAllMainCategorey,
     GetSubCategreyByMainCategorey,
     deleteMainCategorey } = require('../controllers/MainCategory')
+const { getAllVouchers, applyVoucher, createVoucher, activateVoucher, deactivateVoucher } = require('../controllers/VoucherController')
 const cloudinary = require('cloudinary').v2;
 // const fs = require('fs');
 // const path = require('path');
@@ -49,6 +50,8 @@ router.post('/create-order', protect, CreateOrder)
 router.get('/my-order', protect, orderForMe)
 router.get('/admin-order', orderForAdmin)
 router.get('/single-order/:id', getSingleOrderById)
+
+router.delete('/delete-order/:id',deleteOrderById)
 
 router.get('/finduserbyid/:user_id', getUserIdbyUser)
 router.get('/getAllCategorey', getAllCategoryWithImagesAndNumberOfProducts)
@@ -89,5 +92,13 @@ router.put('/Update-Main-Category/:id', UpdateMainCategorey);
 router.get('/Get-All-Main-Categories', GetAllMainCategorey);
 router.get('/Get-Sub-Categories-By-Main-Category/:id', GetSubCategreyByMainCategorey);
 router.delete('/Delete-Main-Category/:id', deleteMainCategorey);
+
+//  ======VOUCHERS     =//
+router.get('/vouchers', getAllVouchers)
+router.post('/apply-vouchers', applyVoucher)
+router.post('/vouchers/create-vouchers', createVoucher)
+router.put('/vouchers/activateVoucher/:id', activateVoucher)
+router.put('/vouchers/deactivateVoucher/:id', deactivateVoucher)
+router.delete('/vouchers/deleteVoucher/:id', deleteVoucher)
 
 module.exports = router 

@@ -11,8 +11,8 @@ exports.CreateOrder = async (req, res) => {
       return res.status(400).json({ error: "Invalid request data" });
     }
 
-    const { cartItems, address, TotalAmount ,
-      PyamentType} = formData;
+    const { cartItems, address, TotalAmount,
+      PyamentType } = formData;
 
     // Check if cartItems or address is empty
     if (!cartItems || cartItems.length === 0 || !address || Object.keys(address).length === 0) {
@@ -71,7 +71,7 @@ exports.orderForMe = async (req, res) => {
 
     // Fetch payments associated with user's orders
     const payments = await Payment.find({ order: { $in: userOrders.map(order => order._id) } });
-// console.log(payments)
+    // console.log(payments)
     // Map transaction IDs to corresponding order IDs
     const orderTransactionMap = {};
     payments.forEach(payment => {
@@ -102,14 +102,14 @@ exports.orderForMe = async (req, res) => {
 };
 
 //mark order return and cancel
-exports.makeOrderCancelAndReturn = async()=>{
-  const {orderId,Stauts} = req.body
+exports.makeOrderCancelAndReturn = async () => {
+  const { orderId, Stauts } = req.body
   //check order in Order
 
   const CheckAndUpdate = await Order.findById(orderId)
-  
+
   // check order stauts 
-  if(CheckAndUpdate.orderStatus === "Pending"){
+  if (CheckAndUpdate.orderStatus === "Pending") {
     CheckAndUpdate.orderStatus === Stauts
   }
 
@@ -119,7 +119,7 @@ exports.orderForAdmin = async (req, res) => {
   try {
     // Fetch orders from the database
     const userOrders = await Order.find();
-    
+
     // Check if there are any orders
     if (!userOrders.length > 0) {
       return res.status(404).json({
@@ -187,7 +187,7 @@ exports.UpdateOrderStatus = async (req, res) => {
       { new: true }
     );
 
-    
+
 
     // For any other status update
     return res.json({ msg: "Order status updated successfully", order: updatedOrder });
@@ -199,24 +199,24 @@ exports.UpdateOrderStatus = async (req, res) => {
 };
 
 
-exports.getTransactionID = async(req,res)=>{
+exports.getTransactionID = async (req, res) => {
 
   try {
     const OrderId = req.params.OrderId
     //check Orderid In Payment Modal
 
-    const checkOrder = await Payment.findOne({order:OrderId})
-    if(!checkOrder){
+    const checkOrder = await Payment.findOne({ order: OrderId })
+    if (!checkOrder) {
       return res.status(403).json({
-        success:true,
-        msg:"No _order Found"
+        success: true,
+        msg: "No _order Found"
       })
     }
     //send Transaction Id
-    const TransactionId  = checkOrder.tranxTionId
+    const TransactionId = checkOrder.tranxTionId
     res.status(201).json({
-      success:true,
-      data:TransactionId
+      success: true,
+      data: TransactionId
     })
   } catch (error) {
     console.log(error)
@@ -252,3 +252,32 @@ exports.getSingleOrderById = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+
+exports.deleteOrderById = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    // Attempt to find the order by its ID
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(403).json({
+        success: false,
+        msg: "Order Not Found"
+      })
+    }
+
+    await order.deleteOne();
+    res.status(200).json({
+      success: true,
+      msg: "Order Deleted Succesfully !!"
+    })
+  } catch (error) {
+    console.log("Error : ", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+}
